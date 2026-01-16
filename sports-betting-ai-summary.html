@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shuffle - Sports Betting with AI Summary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a14;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: #16161f;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            position: relative;
+            border: 1px solid #2a2a3a;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .game-time {
+            color: #8b8b9a;
+            font-size: 14px;
+        }
+
+        .game-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            background: #7c3aed;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .ai-summary-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .ai-summary-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .ai-summary-btn::before {
+            content: '✨';
+            font-size: 14px;
+        }
+
+        .teams-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .team-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .team-name {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .odds-box {
+            background: #0d0d15;
+            border: 1px solid #2a2a3a;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .odds-label {
+            color: #8b8b9a;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .odds-value {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Tooltip Styles */
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .ai-tooltip {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 500px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16162a 100%);
+            border: 2px solid #667eea;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(102, 126, 234, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .tooltip-wrapper:hover .ai-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .ai-tooltip::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 20px;
+            width: 14px;
+            height: 14px;
+            background: #667eea;
+            transform: rotate(45deg);
+        }
+
+        .tooltip-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .tooltip-header h3 {
+            font-size: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .summary-section {
+            margin-bottom: 20px;
+        }
+
+        .summary-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #e0e0f0;
+        }
+
+        .summary-section p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #b8b8c8;
+            margin-bottom: 8px;
+        }
+
+        .summary-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .summary-section li {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #b8b8c8;
+            margin-bottom: 6px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .summary-section li::before {
+            content: '•';
+            position: absolute;
+            left: 4px;
+            color: #667eea;
+        }
+
+        .team-block {
+            background: rgba(102, 126, 234, 0.05);
+            border-left: 3px solid #667eea;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .team-block.seahawks {
+            border-left-color: #69be28;
+        }
+
+        .team-block.niners {
+            border-left-color: #aa0000;
+        }
+
+        .team-block h4 {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #e0e0f0;
+        }
+
+        .highlight-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 8px 0;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            font-size: 13px;
+            color: #ffc107;
+        }
+
+        /* Scrollbar for tooltip */
+        .ai-tooltip::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .ai-tooltip::-webkit-scrollbar-track {
+            background: #1a1a2e;
+            border-radius: 10px;
+        }
+
+        .ai-tooltip::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="margin-bottom: 24px; color: #8b8b9a; font-size: 14px;">
+            📺 Preview: AI-Enhanced Sports Betting Interface
+        </h2>
+
+        <!-- Seahawks vs 49ers Game Card with AI Summary -->
+        <div class="game-card">
+            <div class="game-header">
+                <div class="game-time">Jan 17, 5:00 PM - in a day</div>
+                <div class="game-badges">
+                    <div class="tooltip-wrapper">
+                        <button class="ai-summary-btn">AI Summary</button>
+                        
+                        <!-- AI Summary Tooltip -->
+                        <div class="ai-tooltip">
+                            <div class="tooltip-header">
+                                <span style="font-size: 20px;">✨</span>
+                                <h3>AI-Powered Game Analysis</h3>
+                            </div>
+
+                            <div class="summary-section">
+                                <div class="section-title">🏈 Game Context</div>
+                                <p>This is a Divisional Round playoff game — the winner moves on to the NFC Championship Game. The Seahawks earned the No. 1 seed in the NFC, while the 49ers advanced by winning a tough wild-card matchup against the defending champion Eagles.</p>
+                                <p><strong>Season matchups this year:</strong></p>
+                                <ul>
+                                    <li>Seahawks beat the 49ers 13–3 in Week 18 for the NFC West and top seed.</li>
+                                    <li>Their first meeting earlier in the season was a 49ers win (17–13).</li>
+                                </ul>
+                                <p>The divisional game is a rematch of division rivals who know each other well, historically splitting postseason meetings.</p>
+                            </div>
+
+                            <div class="summary-section">
+                                <div class="section-title">📊 Strengths & Storylines</div>
+                                
+                                <div class="team-block seahawks">
+                                    <h4>🟦 Seattle Seahawks</h4>
+                                    <ul>
+                                        <li>Home-field advantage at Lumen Field — tough environment for road teams.</li>
+                                        <li>Defense has been one of the NFL's best this season.</li>
+                                        <li>Wide receiver Jaxon Smith-Njigba has had an outstanding season and is a major matchup weapon.</li>
+                                        <li>QB Sam Darnold is listed as questionable with an oblique issue — though he's expected to play, backup Drew Lock has taken reps just in case.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="team-block niners">
+                                    <h4>🔴 San Francisco 49ers</h4>
+                                    <ul>
+                                        <li>Coming off a gritty 23–19 wild-card win over the Eagles.</li>
+                                        <li>George Kittle will not play due to a torn Achilles suffered last week.</li>
+                                        <li>Star linebacker Fred Warner remains out, and a few other defenders/receivers are questionable.</li>
+                                        <li>QB Brock Purdy is looking for a bounce-back performance after early struggles vs. Seattle this season.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="summary-section">
+                                <div class="section-title">📈 Odds & Predictions</div>
+                                <ul>
+                                    <li>Seahawks are favored on the road (multiple sportsbooks have Seattle ~7+ point favorites).</li>
+                                    <li>Some models project a competitive game with total points near the mid-40s.</li>
+                                </ul>
+                            </div>
+
+                            <div class="summary-section">
+                                <div class="section-title">🧠 What to Watch</div>
+                                <p><strong>Key questions for this matchup:</strong></p>
+                                <ul>
+                                    <li>Can the 49ers overcome injuries and slow Seattle's defense?</li>
+                                    <li>Will Sam Darnold's questionable status affect the Seahawks' offensive rhythm?</li>
+                                    <li>Which defense steps up — Seattle's elite unit or San Francisco's opportunistic group?</li>
+                                </ul>
+                            </div>
+
+                            <div class="highlight-box">
+                                <p>💡 This analysis is generated by AI and updated in real-time with the latest injury reports and betting trends.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge">+176</span>
+                </div>
+            </div>
+
+            <div class="teams-container">
+                <div>
+                    <div class="team">
+                        <span class="team-icon">🏈</span>
+                        <span class="team-name">Seattle Seahawks</span>
+                    </div>
+                    <div class="team">
+                        <span class="team-icon">🏈</span>
+                        <span class="team-name">San Francisco 49ers</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="odds-box">
+                        <div class="odds-label">Seattle Seahawks</div>
+                        <div class="odds-value">1.28</div>
+                    </div>
+                    <div class="odds-box">
+                        <div class="odds-label">San Francisco 49ers</div>
+                        <div class="odds-value">3.60</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: rgba(102, 126, 234, 0.1); border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.3);">
+            <h3 style="margin-bottom: 12px; color: #667eea; font-size: 16px;">💡 Feature Preview</h3>
+            <p style="color: #b8b8c8; font-size: 14px; line-height: 1.6; margin-bottom: 8px;">
+                <strong>Hover over the "AI Summary" button</strong> to see the intelligent game analysis tooltip in action. This feature provides bettors with comprehensive, AI-generated insights including:
+            </p>
+            <ul style="color: #b8b8c8; font-size: 14px; line-height: 1.6; margin-left: 20px;">
+                <li>Game context and playoff implications</li>
+                <li>Head-to-head history and season matchups</li>
+                <li>Team strengths, injuries, and key players</li>
+                <li>Betting odds analysis and predictions</li>
+                <li>Critical factors to consider before placing bets</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
